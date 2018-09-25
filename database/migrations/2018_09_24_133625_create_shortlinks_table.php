@@ -16,8 +16,8 @@ class CreateShortlinksTable extends Migration
         Schema::create('shortlinks', function (Blueprint $table) {
             $table->increments('id');
             $table->string('url');
-            $table->string('hash');
-            $table->unsignedInteger('clicks');
+            $table->string('hash')->nullable();
+            $table->unsignedInteger('clicks')->default(0);
             $table->unsignedMediumInteger('user_id');
             $table->timestamps();
         });

@@ -27,4 +27,12 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    /**
+     * Get the shortlinks for the user.
+     */
+    public function shortlinks()
+    {
+        return $this->hasMany('App\Shortlink');
+    }
 }
