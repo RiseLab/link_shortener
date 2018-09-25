@@ -16,3 +16,13 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/v1/users/me', function (Request $request){
+	return $request->user();
+})->middleware('auth.basic');
+
+Route::group(['prefix' => '/v1/users/me/shorten_urls', 'middleware' => 'auth.basic'], function () {
+	Route::get('/', function () {
+		return 'test';
+	});
+});
