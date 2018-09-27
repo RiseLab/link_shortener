@@ -27,8 +27,14 @@ Route::get('/v1/users/me', function (Request $request){
 
 Route::group(['prefix' => '/v1/users/me/shorten_urls', 'middleware' => 'auth.basic'], function () {
 
-	Route::post('/', 'ShortlinkController@store');
-
 	Route::get('/', 'ShortlinkController@index');
 
+	Route::post('/', 'ShortlinkController@store');
+
+	Route::get('/{id}', 'ShortlinkController@show');
+
+	Route::delete('/{id}', 'ShortlinkController@destroy');
+
 });
+
+Route::get('/v1/shorten_urls/{hash}', 'ShortlinkController@click');
