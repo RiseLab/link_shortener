@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Validator;
 use Illuminate\Http\Request;
 use App\Shortlink;
+use App\Click;
 use App\Custom\PseudoCrypt;
 
 class ShortlinkController extends Controller
@@ -15,19 +17,9 @@ class ShortlinkController extends Controller
      */
     public function index()
     {
-		return Shortlink::select('url', 'hash', 'clicks')
+		return Shortlink::select('id', 'url', 'hash')
 			->where('user_id', \Auth::user()->id)
 			->get();
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -38,20 +30,24 @@ class ShortlinkController extends Controller
      */
     public function store(Request $request)
     {
-    	$this->validate($request, [
+		$validator = Validator::make($request->all(), [
 			'url' => 'required|url',
 		]);
 
+		if ($validator->fails()){
+			return response()->json($validator->errors()->first('url'), 400);
+		}
+
 		$shortlink = Shortlink::create([
 			'url' => $request->url,
-			'user_id' => $request->user()->id,
+			'user_id' => \Auth::user()->id,
 		]);
 
 		$shortlink->hash = PseudoCrypt::hash($shortlink->id);
 
 		$shortlink->save();
 
-		return $shortlink;
+		return response()->json($shortlink, 201);
     }
 
     /**
@@ -62,18 +58,16 @@ class ShortlinkController extends Controller
      */
     public function show($id)
     {
-        //
-    }
+		$shortlink = Shortlink::select('id', 'url', 'hash')
+			->where('user_id', \Auth::user()->id)
+			->where('id', $id)
+			->first();
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+		if (!is_null($shortlink)){
+			return $shortlink;
+		} else {
+			return response()->json('Link not found.', 400);
+		}
     }
 
     /**
@@ -96,6 +90,31 @@ class ShortlinkController extends Controller
      */
     public function destroy($id)
     {
-        //
+		$shortlink = Shortlink::where('user_id', \Auth::user()->id)
+			->where('id', $id)
+			->first();
+
+		if (!is_null($shortlink)){
+			$shortlink->delete();
+			return response()->json(null, 204);
+		} else {
+			return response()->json('Link not found.', 400);
+		}
     }
+    
+    public function click($hash)
+	{
+		$shortlink = Shortlink::where('hash', $hash)
+			->first();
+
+		if (!is_null($shortlink)){
+			Click::create([
+				'shortlink_id' => $shortlink->id,
+				'referer' => request()->headers->get('referer'),
+			]);
+			return \Redirect::to($shortlink->url);
+		} else {
+			return \Redirect::to('/');
+		}
+	}
 }
