@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Validator;
 use Illuminate\Http\Request;
 use App\Shortlink;
+use App\Click;
 use App\Custom\PseudoCrypt;
 
 class ShortlinkController extends Controller
@@ -16,7 +17,7 @@ class ShortlinkController extends Controller
      */
     public function index()
     {
-		return Shortlink::select('id', 'url', 'hash', 'clicks')
+		return Shortlink::select('id', 'url', 'hash')
 			->where('user_id', \Auth::user()->id)
 			->get();
     }
@@ -57,7 +58,7 @@ class ShortlinkController extends Controller
      */
     public function show($id)
     {
-		$shortlink = Shortlink::select('id', 'url', 'hash', 'clicks')
+		$shortlink = Shortlink::select('id', 'url', 'hash')
 			->where('user_id', \Auth::user()->id)
 			->where('id', $id)
 			->first();
@@ -107,9 +108,11 @@ class ShortlinkController extends Controller
 			->first();
 
 		if (!is_null($shortlink)){
-			$shortlink->clicks = $shortlink->clicks + 1;
-			$shortlink->save();
-			return \Redirect::to('//' . $shortlink->url);
+			Click::create([
+				'shortlink_id' => $shortlink->id,
+				'referer' => request()->headers->get('referer'),
+			]);
+			return \Redirect::to($shortlink->url);
 		} else {
 			return \Redirect::to('/');
 		}

@@ -17,4 +17,12 @@ class Shortlink extends Model
     {
         return $this->belongsTo('App\User');
     }
+
+	/**
+	 * Get the clicks for the shortlink.
+	 */
+	public function clicks()
+	{
+		return $this->hasMany('App\Click');
+	}
 }

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateShortlinksTable extends Migration
+class CreateClicksTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,11 @@ class CreateShortlinksTable extends Migration
      */
     public function up()
     {
-        Schema::create('shortlinks', function (Blueprint $table) {
+        Schema::create('clicks', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('url');
-            $table->string('hash')->nullable();
-            $table->unsignedMediumInteger('user_id');
-            $table->timestamps();
+			$table->unsignedMediumInteger('shortlink_id');
+			$table->string('referer')->nullable();
+            $table->timestamp('created_at');
         });
     }
 
@@ -29,6 +28,6 @@ class CreateShortlinksTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('shortlinks');
+        Schema::dropIfExists('clicks');
     }
 }
