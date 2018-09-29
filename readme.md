@@ -66,7 +66,7 @@ php artisan:migrate
 
    - [ ] **Отчеты**:
    
-     - [ ] ```GET /api/v1/users/me/shorten_urls/{id}/[days,hours,min]?from_date=0000-00-00&amp;to_date=0000-00-00``` - получение временного графика количества переходов с группировкой по дням, часам, минутам;
+     - [ ] ```GET /api/v1/users/me/shorten_urls/{id}/[days,hours,min]?from_date=0000-00-00&to_date=0000-00-00``` - получение временного графика количества переходов с группировкой по дням, часам, минутам;
      
      - [x] ```GET /api/v1/users/me/shorten_urls/{id}/referers``` - получение топа из 20 сайтов иcточников переходов;
      
