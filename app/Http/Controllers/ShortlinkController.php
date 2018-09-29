@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Shortlink;
 use App\Click;
 use App\Custom\PseudoCrypt;
@@ -35,7 +36,7 @@ class ShortlinkController extends Controller
 		]);
 
 		if ($validator->fails()){
-			return response()->json($validator->errors()->first('url'), 400);
+			return response()->json(['error' => $validator->errors()->first('url')], 400);
 		}
 
 		$shortlink = Shortlink::create([
@@ -61,12 +62,13 @@ class ShortlinkController extends Controller
 		$shortlink = Shortlink::select('id', 'url', 'hash')
 			->where('user_id', \Auth::user()->id)
 			->where('id', $id)
+			->withCount('clicks')
 			->first();
 
 		if (!is_null($shortlink)){
 			return $shortlink;
 		} else {
-			return response()->json('Link not found.', 400);
+			return response()->json(['error' => 'Link not found.'], 400);
 		}
     }
 
@@ -98,10 +100,16 @@ class ShortlinkController extends Controller
 			$shortlink->delete();
 			return response()->json(null, 204);
 		} else {
-			return response()->json('Link not found.', 400);
+			return response()->json(['error' => 'Link not found.'], 400);
 		}
     }
-    
+
+	/**
+	 * Redirect to link by passed hash
+	 *
+	 * @param $hash
+	 * @return mixed
+	 */
     public function click($hash)
 	{
 		$shortlink = Shortlink::where('hash', $hash)
@@ -116,5 +124,23 @@ class ShortlinkController extends Controller
 		} else {
 			return \Redirect::to('/');
 		}
+	}
+
+	public function reportReferers($id)
+	{
+		$shortlink = Shortlink::where('user_id', \Auth::user()->id)
+			->where('id', $id)
+			->first();
+
+		if (is_null($shortlink)){
+			return response()->json(['error' => 'Link not found.'], 400);
+		}
+
+		return Click::select('referer', DB::raw('COUNT(*) as clicks_count'))
+			->where('shortlink_id', $id)
+			->groupBy('referer')
+			->orderBy('clicks_count', 'desc')
+			->take(20)
+			->get();
 	}
 }

@@ -13,11 +13,7 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-
-	return $request->user();
-
-});
+Route::post('/v1/users', 'UserController@store');
 
 Route::get('/v1/users/me', function (Request $request){
 
@@ -35,6 +31,12 @@ Route::group(['prefix' => '/v1/users/me/shorten_urls', 'middleware' => 'auth.bas
 
 	Route::delete('/{id}', 'ShortlinkController@destroy');
 
+	Route::get('/{id}/referers', 'ShortlinkController@reportReferers');
+
 });
 
 Route::get('/v1/shorten_urls/{hash}', 'ShortlinkController@click');
+
+Route::fallback(function (){
+	return response()->json(['error' => 'Resource not found.'], 404);
+});
