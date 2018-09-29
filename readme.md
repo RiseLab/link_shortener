@@ -2,7 +2,79 @@
 
 RESTful API для сокращателя ссылок. Сокращатель ссылок - сервис, который позволяет пользователю создавать более короткие адреса, которые лучше передавать другим пользователям и собирает статистику по совершенным переходам.
 
-# Laravel
+## Getting started
+
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+
+### Prerequisites
+
+- Web Server (Apache, Nginx, etc.)
+- PHP v7.1.3
+- MySQL v5.x
+- Git
+- Composer
+
+### Installing
+
+**This project based on Laravel Framework v5.7.6**
+
+1. Download project sources from GitHub or clone it using Git
+```
+git clone git@github.com:RiseLab/link_shortener.git
+```
+2. Download project dependencies via Composer
+```
+composer update
+```
+3. Rename ```.env.example``` file to ```.env```, open and change database connection settings
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=[your database name]
+DB_USERNAME=[your database user name]
+DB_PASSWORD=[your database user password]
+```
+4. Run database migrations
+```
+php artisan:migrate
+```
+
+## API description
+
+### Authorization
+
+Используется HTTP Basic Authorization, где параметром является пара логин-пароль в виде base64.
+
+### Resources
+
+1. **/api/v1/users** - ресурс, предоставляющий работу с пользователями:
+
+   - [x] ```POST /api/v1/users``` - регистрация пользователя (авторизация не требуется);
+   
+   - [x] ```GET /api/v1/users/me``` - получение информации о текущем авторизованном пользователе;
+
+2. **/api/v1/users/me/shorten_urls** - ресурс, предоставляющий работу с короткими ссылками пользователя:
+
+   - [x] ```POST /api/v1/users/me/shorten_urls``` - создание новой короткой ссылки;
+   
+   - [x] ```GET /api/v1/users/me/shorten_urls``` - получение всех созданных коротких ссылок пользователя;
+   
+   - [x] ```GET /api/v1/users/me/shorten_urls/{id}``` - получение информации о конкретной короткой ссылке пользователя (также включает количество переходов);
+   
+   - [x] ```DELETE /api/v1/users/me/shorten_urls/{id}``` - удаление короткой ссылки пользователя;
+
+   - [ ] **Отчеты**:
+   
+     - [ ] ```GET /api/v1/users/me/shorten_urls/{id}/[days,hours,min]?from_date=0000-00-00&amp;to_date=0000-00-00``` - получение временного графика количества переходов с группировкой по дням, часам, минутам;
+     
+     - [x] ```GET /api/v1/users/me/shorten_urls/{id}/referers``` - получение топа из 20 сайтов иcточников переходов;
+     
+3. **/api/v1/shorten_urls** ресурс, предоставляющий работу с короткими ссылками (авторизация не требуется):
+
+   - [x] ```GET /api/v1/shorten_urls/{hash}``` - переход по ссылке (302 redirect).
+
+#
 
 <p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
 
