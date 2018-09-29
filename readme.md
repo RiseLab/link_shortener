@@ -1,3 +1,9 @@
+# Link shortener API
+
+RESTful API для сокращателя ссылок. Сокращатель ссылок - сервис, который позволяет пользователю создавать более короткие адреса, которые лучше передавать другим пользователям и собирает статистику по совершенным переходам.
+
+# Laravel
+
 <p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
 
 <p align="center">
