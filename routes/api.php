@@ -33,6 +33,8 @@ Route::group(['prefix' => '/v1/users/me/shorten_urls', 'middleware' => 'auth.bas
 
 	Route::get('/{id}/referers', 'ShortlinkController@reportReferers');
 
+	Route::get('/{id}/{interval}', 'ShortlinkController@reportTimeGraph');
+
 });
 
 Route::get('/v1/shorten_urls/{hash}', 'ShortlinkController@click');
