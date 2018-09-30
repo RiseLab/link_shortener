@@ -46,6 +46,7 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+    	// FIXME: temporary solution for send correct JSON API response when user is not authorized
     	if (get_class($exception) == 'Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException'){
 		    return response()->json(['error' => $exception->getMessage()], $exception->getStatusCode());
 	    }

@@ -105,7 +105,7 @@ class ShortlinkController extends Controller
     }
 
 	/**
-	 * Redirect to link by passed hash
+	 * Redirect to link by passed hash.
 	 *
 	 * @param $hash
 	 * @return mixed
@@ -126,6 +126,12 @@ class ShortlinkController extends Controller
 		}
 	}
 
+	/**
+	 * Get top referrers for the shortlink.
+	 *
+	 * @param int $id
+	 * @return \Illuminate\Http\JsonResponse
+	 */
 	public function reportReferers($id)
 	{
 		$shortlink = Shortlink::where('user_id', \Auth::user()->id)
@@ -141,6 +147,59 @@ class ShortlinkController extends Controller
 			->groupBy('referer')
 			->orderBy('clicks_count', 'desc')
 			->take(20)
+			->get();
+	}
+
+	/**
+	 * Get clicks time graph for the link with grouping by days, hours, minutes
+	 *
+	 * @param $id
+	 * @param $interval
+	 * @return \Illuminate\Http\JsonResponse
+	 */
+	public function reportTimeGraph($id, $interval)
+	{
+		// TODO: check and optimize code
+
+		$intervals = [
+			'days' => '00:00',
+			'hours' => '%H:00',
+			'mins' => '%H:%i',
+		];
+
+		// Check if link exists for current user
+		$shortlink = Shortlink::where('user_id', \Auth::user()->id)
+			->where('id', $id)
+			->first();
+
+		if (is_null($shortlink)){
+			return response()->json(['error' => 'Link not found.'], 400);
+		}
+
+		// Check correct interval type
+		if (!array_key_exists($interval, $intervals)){
+			return response()->json(['error' => 'Incorrect interval type.'], 400);
+		}
+
+		// Check correct interval dates format
+		$validator = Validator::make(request()->all(), [
+			'from_date' => 'date_format:Y-m-d',
+			'to_date' => 'date_format:Y-m-d',
+		]);
+
+		if ($validator->fails()){
+			return response()->json(['error' => $validator->errors()->first()], 400);
+		}
+
+		// Set interval dates values
+		$dateFrom = request('from_date') ?: '1970-01-01';
+		$dateTo = request('to_date') ?: date('Y-m-d');
+
+		return Click::select(DB::raw('DATE_FORMAT(created_at, \'%Y-%m-%d ' . $intervals[$interval] . ':00\') as date_point, COUNT(*) as clicks_count'))
+			->where('shortlink_id', $id)
+			->whereBetween('created_at', [$dateFrom, $dateTo])
+			->groupBy('date_point')
+			->orderBy('date_point')
 			->get();
 	}
 }
