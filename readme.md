@@ -39,6 +39,18 @@ DB_PASSWORD=[your database user password]
 ```
 php artisan:migrate
 ```
+5. Generate application key
+```
+php artisan key:generate
+```
+6. Configure your web server's document/web root to be the ```public``` directory of the project
+
+### Local development server
+
+Instead of installing web server you can use PHP's built-in development server. Command below will start it at http://localhost:8000
+```
+php artisan serve
+```
 
 ## API description
 
@@ -64,9 +76,9 @@ php artisan:migrate
    
    - [x] ```DELETE /api/v1/users/me/shorten_urls/{id}``` - удаление короткой ссылки пользователя;
 
-   - [ ] **Отчеты**:
+   - [x] **Отчеты**:
    
-     - [ ] ```GET /api/v1/users/me/shorten_urls/{id}/[days,hours,mins]?from_date=YYYY-MM-DD&to_date=YYYY-MM-DD``` - получение временного графика количества переходов с группировкой по дням, часам, минутам;
+     - [x] ```GET /api/v1/users/me/shorten_urls/{id}/[days,hours,mins]?from_date=YYYY-MM-DD&to_date=YYYY-MM-DD``` - получение временного графика количества переходов с группировкой по дням, часам, минутам;
      
      - [x] ```GET /api/v1/users/me/shorten_urls/{id}/referers``` - получение топа из 20 сайтов иcточников переходов;
      
@@ -90,11 +102,16 @@ php artisan:migrate
 
 - [ ] ```403```: **Forbidden.** The user is authenticated, but does not have the permissions to perform an action.
 
-- [ ] ```404```: **Not found.** This will be returned when the resource is not found.
+- [x] ```404```: **Not found.** This will be returned when the resource is not found.
 
 - [ ] ```500```: **Internal server error.** Ideally you're not going to be explicitly returning this, but if something unexpected breaks, this is what your user is going to receive.
 
 - [ ] ```503```: **Service unavailable.** Pretty self explanatory, but also another code that is not going to be returned explicitly by the application.
+
+## TODO
+
+- [ ] API unit tests
+- [ ] API authentication based on JSON Web Tokens (using Laravel Passport package)
 
 #
 
